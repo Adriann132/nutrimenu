@@ -28,6 +28,7 @@ jobs:
         host: ${{ secrets.GCP_IP }}
         username: ${{ secrets.GCP_USER }}
         key: ${{ secrets.GCP_SSH_KEY }}
+        port: 22
         source: "target/*.jar"
         target: "/home/${{ secrets.GCP_USER }}/app"
         strip_components: 1
