@@ -21,9 +21,15 @@ public class NutriController {
     private MenuRepository menuRepo;
 
     // 1. Crear un usuario (Ej: POST http://localhost:8080/api/usuarios)
+    // Cambia el antiguo por este
+// 1. Crear un usuario desde el formulario Web
     @PostMapping("/usuarios")
-    public Usuario crearUsuario(@RequestBody Usuario usuario) {
-        return usuarioRepo.save(usuario);
+    public org.springframework.web.servlet.view.RedirectView crearUsuario(@RequestParam String nombre) {
+        Usuario u = new Usuario();
+        u.setNombre(nombre);
+        usuarioRepo.save(u);
+        // Usamos RedirectView para forzar la redirección aunque sea un RestController
+        return new org.springframework.web.servlet.view.RedirectView("/ver-usuarios");
     }
 
     // Nuevo método para listar todos los usuarios
