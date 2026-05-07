@@ -1,0 +1,46 @@
+name: Deploy NutriMenu to Google Cloud
+
+on:
+  push:
+    branches: [ "master", "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v4
+
+    - name: Configurar Java 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: 'maven'
+
+    - name: Compilar con Maven (Generar JAR)
+      run: mvn clean package -DskipTests
+
+    - name: Enviar JAR al servidor
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.GCP_IP }}
+        username: ${{ secrets.GCP_USER }}
+        key: ${{ secrets.GCP_SSH_KEY }}
+        source: "target/*.jar"
+        target: "/home/${{ secrets.GCP_USER }}/app"
+        strip_components: 1
+
+    - name: Arrancar la aplicación en Google Cloud
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.GCP_IP }}
+        username: ${{ secrets.GCP_USER }}
+        key: ${{ secrets.GCP_SSH_KEY }}
+        script: |
+          # Matar la versión anterior si existe
+          sudo fuser -k 8080/tcp || true
+          # Ejecutar la nueva versión en segundo plano
+          cd /home/${{ secrets.GCP_USER }}/app
+          nohup java -jar *.jar > log.txt 2>&1 &
