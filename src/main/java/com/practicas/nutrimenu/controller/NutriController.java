@@ -26,6 +26,12 @@ public class NutriController {
         return usuarioRepo.save(usuario);
     }
 
+    // Nuevo método para listar todos los usuarios
+    @GetMapping("/usuarios")
+    public List<Usuario> listarUsuarios() {
+        return usuarioRepo.findAll();
+    }
+
     // 2. Registrar un menú a un usuario (Ej: POST http://localhost:8080/api/1/menu)
     @PostMapping("/{usuarioId}/menu")
     public Menu registrarMenu(@PathVariable Long usuarioId, @RequestBody Menu menu) {
